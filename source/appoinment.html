@@ -1,0 +1,355 @@
+@@include('header.htm')
+@@include('blocks/navigation.htm')
+@@include('blocks/page-title.htm', {
+"title": "Agendamento",
+"description": "Garanta seu horário"
+})
+
+<section class="appoinment section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4">
+          <div class="mt-3">
+            <div class="feature-icon mb-3">
+              <i class="icofont-support text-lg"></i>
+            </div>
+             <span class="h3">Precisa de Ajuda Urgente?</span>
+             <h2 class="text-color mt-3">+55 (XX) XXXX-XXXX</h2>
+          </div>
+      </div>
+
+      <div class="col-lg-8">
+           <div class="appoinment-wrap mt-5 mt-lg-0 pl-lg-5">
+             <h2 class="mb-2 title-color">Faça um Agendamento</h2>
+             <p class="mb-4">Preencha os dados abaixo para marcar sua consulta. O agendamento só será confirmado após o pagamento via Pix.</p>
+               
+             <form id="appointment-form" class="appoinment-form">
+                  <div class="row">
+                       <div class="col-lg-6">
+                           <div class="form-group">
+                              <select class="form-control" id="professional-select" required>
+                                <option value="">Selecione o Profissional</option>
+                              </select>
+                           </div>
+                       </div>
+                       <div class="col-lg-6">
+                         <div class="form-group">
+                           <input name="date" id="date-select" type="date" class="form-control" required>
+                         </div>
+                       </div>
+
+                       <div class="col-lg-12">
+                          <div class="form-group">
+                            <h5 class="mb-3">Horários Disponíveis:</h5>
+                            <div id="time-slots" class="row">
+                              <p class="col-12 text-muted">Selecione um profissional e uma data para ver os horários.</p>
+                            </div>
+                            <input type="hidden" id="time-selected" name="time" required>
+                          </div>
+                       </div>
+
+                       <div class="col-lg-6">
+                           <div class="form-group">
+                              <input name="name" id="name" type="text" class="form-control" placeholder="Nome Completo" required>
+                           </div>
+                       </div>
+
+                       <div class="col-lg-6">
+                           <div class="form-group">
+                              <input name="phone" id="phone" type="tel" class="form-control" required>
+                           </div>
+                       </div>
+
+                       <!-- NOVO CAMPO DE CPF/CNPJ -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                            <input name="document" id="document" type="text" class="form-control" placeholder="CPF" required>
+                            </div>
+                        </div>
+
+                        <!-- Adicione o campo de Email também, que é essencial -->
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                            <input name="email" id="email" type="email" class="form-control" placeholder="Seu E-mail" required>
+                            </div>
+                        </div>
+
+                        <!-- Adicione estes campos dentro do <div class="row"> do seu formulário -->
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                            <input name="zip_code" id="zip_code" type="text" class="form-control" placeholder="CEP" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                            <input name="street" id="street" type="text" class="form-control" placeholder="Rua / Logradouro" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                            <input name="street_number" id="street_number" type="text" class="form-control" placeholder="Número" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                            <input name="neighborhood" id="neighborhood" type="text" class="form-control" placeholder="Bairro" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                            <input name="city" id="city" type="text" class="form-control" placeholder="Cidade" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                            <input name="state" id="state" type="text" class="form-control" placeholder="Estado (UF)" required maxlength="2">
+                            </div>
+                        </div>
+
+                  </div>
+                  <div class="form-group-2 mb-4">
+                      <textarea name="message" id="message" class="form-control" rows="4" placeholder="Sua mensagem (opcional)"></textarea>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-main btn-round-full">Confirmar e Pagar <i class="icofont-simple-right ml-2"></i></button>
+             </form>
+           </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de Pagamento PIX -->
+<div class="modal fade" id="pixModal" tabindex="-1" role="dialog" aria-labelledby="pixLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content p-4">
+      <h5 id="pixLabel" class="mb-3">Confirme e Pague com Pix</h5>
+      
+      <div id="appointment-summary" class="alert alert-light mb-3">
+        <p class="mb-1"><strong>Profissional:</strong> <span id="summary-professional"></span></p>
+        <p class="mb-1"><strong>Data:</strong> <span id="summary-date"></span></p>
+        <p class="mb-0"><strong>Horário:</strong> <span id="summary-time"></span></p>
+      </div>
+      
+      <img id="qrImg" alt="QR Code Pix" class="img-fluid mb-3 mx-auto d-block" style="max-width: 220px;"/>
+      
+      <div class="input-group mb-3">
+        <input type="text" id="pixCopy" class="form-control" readonly>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="copy-button">Copiar</button>
+        </div>
+      </div>
+      
+      <p class="text-muted mb-0 small text-center">Após o pagamento, seu agendamento será confirmado automaticamente.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- ELEMENTOS DO DOM ---
+    const form = document.getElementById('appointment-form');
+    if (!form) {
+        console.error('ERRO: Formulário com id "appointment-form" não encontrado!');
+        return;
+    }
+    
+    const professionalSelect = document.getElementById('professional-select');
+    const dateSelect = document.getElementById('date-select');
+    const timeSlotsContainer = document.getElementById('time-slots');
+    const timeSelectedInput = document.getElementById('time-selected');
+    const phoneInputField = document.getElementById('phone');
+
+    // --- DECLARAÇÃO DA VARIÁVEL EM ESCOPO SUPERIOR ---
+    let phoneInput; 
+
+    // --- DADOS E INICIALIZAÇÃO ---
+    let professionalsData = [];
+
+    function initializePhoneInput() {
+        phoneInput = window.intlTelInput(phoneInputField, {
+            nationalMode: true,
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://freegeoip.app/json/").then(res => res.json()).then(data => callback(data.country_code)).catch(() => callback("br"));
+            },
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+        });
+    }
+
+    async function populateProfessionals() {
+        try {
+            const response = await fetch('/api/professionals');
+            professionalsData = await response.json();
+            professionalsData.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name;
+                professionalSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar profissionais:', error);
+        }
+    }
+
+    async function loadTimeSlots() {
+        const professionalId = professionalSelect.value;
+        const date = dateSelect.value;
+        timeSelectedInput.value = '';
+        if (!professionalId || !date) {
+            timeSlotsContainer.innerHTML = '<p class="col-12 text-muted">Selecione um profissional e uma data para ver os horários.</p>';
+            return;
+        }
+        timeSlotsContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Carregando...</span></div></div>';
+        try {
+            const response = await fetch(`/api/availability?professionalId=${professionalId}&date=${date}`);
+            if (!response.ok) throw new Error('Falha ao buscar horários da API.');
+            const slots = await response.json();
+            timeSlotsContainer.innerHTML = '';
+            if (slots.length === 0) {
+                timeSlotsContainer.innerHTML = '<p class="col-12 text-muted">Nenhum horário disponível para esta data.</p>';
+                return;
+            }
+            slots.forEach(slot => {
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-4 mb-2';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-outline-primary btn-block';
+                btn.textContent = new Date(slot.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                btn.dataset.time = slot.start;
+                btn.onclick = () => {
+                    timeSelectedInput.value = btn.dataset.time;
+                    document.querySelectorAll('#time-slots button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+                col.appendChild(btn);
+                timeSlotsContainer.appendChild(col);
+            });
+        } catch (error) {
+            timeSlotsContainer.innerHTML = '<p class="col-12 text-danger">Erro ao carregar horários. Tente novamente.</p>';
+            console.error(error);
+        }
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        if (!phoneInput || !phoneInputField.value.trim()) {
+            alert('Por favor, insira um número de telefone.');
+            return;
+        }
+        const numberData = phoneInput.getNumber(intlTelInputUtils.numberFormat.E164);
+        if (!numberData) {
+            alert('O formato do telefone parece inválido. Verifique o número digitado.');
+            return;
+        }
+        if (!timeSelectedInput.value) {
+            alert('Por favor, selecione um horário.');
+            return;
+        }
+
+        const professionalId = professionalSelect.value;
+        const professional = professionalsData.find(p => p.id === professionalId);
+        
+        const selectedDate = new Date(dateSelect.value + 'T00:00:00-03:00');
+        const selectedTime = new Date(timeSelectedInput.value);
+        const endTime = new Date(selectedTime.getTime() + 60 * 60 * 1000);
+
+        document.getElementById('summary-professional').textContent = professional.name;
+        document.getElementById('summary-date').textContent = selectedDate.toLocaleDateString('pt-BR');
+        document.getElementById('summary-time').textContent = selectedTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        const countryData = phoneInput.getSelectedCountryData();
+        
+        // --- CORREÇÃO AQUI: Declarando a variável antes de usá-la ---
+        const documentRaw = document.getElementById('document').value.replace(/\D/g, '');
+
+        const customer = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            type: documentRaw.length > 11 ? 'company' : 'individual',
+            document: documentRaw,
+            address: {
+                country: countryData.iso2.toUpperCase(),
+                state: document.getElementById('state').value,
+                city: document.getElementById('city').value,
+                zip_code: document.getElementById('zip_code').value.replace(/\D/g, ''),
+                line_1: `${document.getElementById('street').value}, ${document.getElementById('street_number').value}`,
+                line_2: document.getElementById('neighborhood').value
+            },
+            phones: {
+                mobile_phone: {
+                    country_code: countryData.dialCode,
+                    area_code: numberData.substring(countryData.dialCode.length + 1, countryData.dialCode.length + 3),
+                    number: numberData.substring(countryData.dialCode.length + 3)
+                }
+            }
+        };
+
+        const metadata = {
+            calendarId: professional.calendarId,
+            summary: `Consulta com ${professional.name}`,
+            description: document.getElementById('message').value || 'Agendamento via site.',
+            startISO: selectedTime.toISOString(),
+            endISO: endTime.toISOString(),
+            attendeePhone: numberData,
+            attendeeEmail: customer.email
+        };
+
+        try {
+            const response = await fetch('/api/checkout/pix', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amountInCents: 10000, customer, metadata })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Erro retornado pelo backend:', errorData);
+                throw new Error('Falha na comunicação com o servidor de pagamento.');
+            }
+
+            const order = await response.json();
+
+                // --- RENDERIZAÇÃO CORRETA DO QR CODE ---
+                if (order.qrCodePayload) {
+                // Gera o QR Code a partir do payload "copia e cola"
+                const qr = qrcode(0, 'L');
+                qr.addData(order.qrCodePayload);
+                qr.make();
+                document.getElementById('qrImg').src = qr.createDataURL(4);
+                } else {
+                // Esconde a imagem se não houver QR Code
+                document.getElementById('qrImg').style.display = 'none';
+                }
+
+                document.getElementById('pixCopy').value = order.pixCopyPaste;
+
+                $('#pixModal').modal('show');
+
+                $('#pixModal').modal('show');
+        } catch (error) {
+            alert('Não foi possível gerar o pagamento Pix. Verifique os dados e tente novamente.');
+            console.error('Erro no checkout:', error);
+        }
+    }
+    
+    document.getElementById('copy-button').addEventListener('click', () => {
+        const pixInput = document.getElementById('pixCopy');
+        navigator.clipboard.writeText(pixInput.value).then(() => alert('Código Pix copiado!'));
+    });
+
+    form.addEventListener('submit', handleFormSubmit);
+    professionalSelect.addEventListener('change', loadTimeSlots);
+    dateSelect.addEventListener('change', loadTimeSlots);
+    
+    initializePhoneInput();
+    populateProfessionals();
+});
+</script>
+
+
+@@include('blocks/footer.htm')
+@@include('footer.htm')
